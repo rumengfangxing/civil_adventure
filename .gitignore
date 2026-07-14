@@ -1,0 +1,25 @@
+# build / ide
+.gradle/
+build/
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# run
+run/
+runs/
+run-data/
+
+# non-mod files
+base-mod-api/
+base-mod-src/
+Civil_Adventure_代码审查报告.md
+nbt
+.gitattributes
+.github/
+
+# gradle junk
+gradle/*.jar
+!gradle/wrapper/gradle-wrapper.jar

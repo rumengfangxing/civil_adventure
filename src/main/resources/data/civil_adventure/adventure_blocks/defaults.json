@@ -1,0 +1,7 @@
+{
+  "_comment": "冒险区方块权重示例 — 此文件仅为格式参考，不生效。\n  复制此文件修改 block 和 weight 以启用自定义冒险区方块。",
+  "replace": false,
+  "entries": [
+    { "block": "example:example_block", "weight": 1.0 }
+  ]
+}

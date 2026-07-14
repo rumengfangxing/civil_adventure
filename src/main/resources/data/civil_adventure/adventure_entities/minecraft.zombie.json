@@ -1,0 +1,10 @@
+{
+  "_comment": "僵尸在冒险区内获得属性加成",
+  "attributes": [
+    { "attribute": "minecraft:generic.attack_damage", "modifier": 0.2, "operation": 1 }
+  ],
+  "effects": [
+    { "effect": "minecraft:fire_resistance", "duration": 300, "amplifier": 0 },
+    { "effect": "minecraft:regeneration", "duration": 100, "amplifier": 0 }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "civil_adventure.mixin",
+  "refmap": "civil_adventure.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AdventureBlockChangeMixin",
+    "CivilMapTintPaletteMixin",
+    "CivilRegionClassifierMixin",
+    "SonarScanMixin",
+    "CivilizationScoreMixin",
+    "XaerosColorMixin"
+  ],
+  "client": [],
+  "server": []
+}
