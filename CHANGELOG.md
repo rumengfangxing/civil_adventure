@@ -8,6 +8,7 @@
 - 区块加载自动扫描（`ChunkEvent.Load` → `recalculateFullChunk`）
 - 文明分类 HIGH → ZONE 覆写（`CivilRegionClassifierMixin`）
 - API 扩展：`getRawScoreAt`、`getZoneCenter`
+- `prevZoneState` 玩家退出清理 + 网络包去抖（20 tick 冷却）
 
 ### 🔧 配置
 

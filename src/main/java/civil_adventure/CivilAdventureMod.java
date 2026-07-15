@@ -13,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -42,8 +43,10 @@ public class CivilAdventureMod {
     private static volatile AdventureScoreService scoreService;
     private static volatile AdventureZoneScanner zoneScanner;
 
-    // 玩家 → 上次是否在冒险区
+    // 玩家进出冒险区状态追踪
     private final Map<UUID, Boolean> prevZoneState = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> lastTransitionTick = new ConcurrentHashMap<>();
+    private static final int TRANSITION_COOLDOWN = 20; // tick，至少间隔 1 秒
     private long epoch = 0;
 
     public CivilAdventureMod() {
@@ -66,6 +69,7 @@ public class CivilAdventureMod {
         MinecraftForge.EVENT_BUS.addListener(this::onLivingDeath);
         MinecraftForge.EVENT_BUS.addListener(this::onChunkUnload);
         MinecraftForge.EVENT_BUS.addListener(this::onChunkLoad);
+        MinecraftForge.EVENT_BUS.addListener(this::onPlayerLogout);
     }
 
     private void onServerStarted(ServerStartedEvent event) {
@@ -75,6 +79,7 @@ public class CivilAdventureMod {
         AdventureBlockLoader.reload(server.getResourceManager());
         AdventureEntityLoader.reload(server.getResourceManager());
         prevZoneState.clear();
+        lastTransitionTick.clear();
 
         LOGGER.info("冒险区系统初始化完成");
     }
@@ -83,6 +88,7 @@ public class CivilAdventureMod {
         if (scoreService != null) { scoreService.shutdown(); scoreService = null; }
         zoneScanner = null;
         prevZoneState.clear();
+        lastTransitionTick.clear();
     }
 
     private void onServerTick(TickEvent.ServerTickEvent event) {
@@ -102,15 +108,21 @@ public class CivilAdventureMod {
                 if (!player.isAlive()) continue;
                 boolean inZone = scoreService.getNormalizedScoreAt(level, player.blockPosition())
                     >= AdventureConfig.ZONE_THRESHOLD.get();
-                Boolean prev = prevZoneState.get(player.getUUID());
+                UUID puid = player.getUUID();
+                Boolean prev = prevZoneState.get(puid);
 
                 if (prev != null && prev != inZone) {
-                    epoch++;
-                    CHANNEL.send(
-                        PacketDistributor.PLAYER.with(() -> player),
-                        new AdventureTransitionPayload(inZone, epoch));
+                    // 去抖：同玩家切换冷却
+                    Long lastTick = lastTransitionTick.get(puid);
+                    if (lastTick == null || currentTick - lastTick >= TRANSITION_COOLDOWN) {
+                        epoch++;
+                        CHANNEL.send(
+                            PacketDistributor.PLAYER.with(() -> player),
+                            new AdventureTransitionPayload(inZone, epoch));
+                        lastTransitionTick.put(puid, currentTick);
+                    }
                 }
-                prevZoneState.put(player.getUUID(), inZone);
+                prevZoneState.put(puid, inZone);
             }
         }
     }
@@ -132,6 +144,12 @@ public class CivilAdventureMod {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var pos = event.getChunk().getPos();
         scoreService.recalculateFullChunk(level, pos.x, pos.z);
+    }
+
+    private void onPlayerLogout(PlayerEvent.PlayerLoggedOutEvent event) {
+        UUID uuid = event.getEntity().getUUID();
+        prevZoneState.remove(uuid);
+        lastTransitionTick.remove(uuid);
     }
 
     public static AdventureScoreService getScoreService() { return scoreService; }
