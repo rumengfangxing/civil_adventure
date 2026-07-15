@@ -15,8 +15,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
- * 当冒险区活跃时，顶掉文礼的文明区分类（返回 NONE）。
- * 冒险区与文明区互斥——区块是冒险区就不再是文明区。
+ * 冒险区活跃时，顶掉文礼的文明区分类（HIGH → ZONE）。
+ * 使探测器贴图/音效/粒子/边界墙自动走文礼 ZONE 流程。
+ *
+ * 不影响怪物逃逸和生成拦截——getScoreAt/getCScoreAt 覆写仍然返回 0。
  */
 @Mixin(value = CivilRegionClassifier.class, remap = false)
 public class CivilRegionClassifierMixin {
@@ -40,7 +42,6 @@ public class CivilRegionClassifierMixin {
         AdventureScoreService svc = CivilAdventureMod.getScoreService();
         if (svc == null) return;
 
-        // 取区块中心位置检测冒险区分数
         BlockPos center = new BlockPos(
             vc.getCx() * 16 + 8,
             vc.getSy() * 16 + 8,
@@ -48,8 +49,9 @@ public class CivilRegionClassifierMixin {
         );
 
         if (svc.getNormalizedScoreAt(level, center) >= AdventureConfig.ZONE_THRESHOLD.get()) {
-            // 冒险区覆盖 → 返回 NONE 使文礼视为无文明区域
-            cir.setReturnValue(new ClassifyResult(CivilRegionKind.NONE, null));
+            // 冒险区覆盖文明区 → 返回 ZONE（非 NONE）
+            // ZONE 让探测器以紫色墙/冒险区音效/粒子显示
+            cir.setReturnValue(new ClassifyResult(CivilRegionKind.ZONE, null));
         }
     }
 }

@@ -13,21 +13,62 @@ import java.util.concurrent.ConcurrentHashMap;
  * 区块键自包含，不依赖文礼 VoxelChunkKey。
  */
 public class AdventureScoreService {
+
+    // ── 持久分数存储 ──────────────────────────────────
     private final ConcurrentHashMap<String, Double> perChunkScores = new ConcurrentHashMap<>();
+
+    // ── 冷却批处理 ─────────────────────────────────────
+    private final ConcurrentHashMap<String, String> dirtyChunks = new ConcurrentHashMap<>(); // dim:cx,cz,0 → dim
+    private long cooldownEnd = -1;
 
     public void shutdown() {
         perChunkScores.clear();
+        dirtyChunks.clear();
+        cooldownEnd = -1;
     }
 
-    /** 区块卸载时清理对应分数（含所有 Y 层），防内存泄漏 */
-    public void onChunkUnload(ServerLevel level, int cx, int cz) {
-        String prefix = level.dimension().location().toString() + ":" + cx + "," + cz + ",";
-        perChunkScores.keySet().removeIf(k -> k.startsWith(prefix));
+    // ===================================================================
+    //  冷却批处理
+    // ===================================================================
+
+    /** 标记脏区块（方块变化时调用），不立即重算 */
+    public void markDirty(String dim, int cx, int cz) {
+        String key = ChunkKey.key(dim, cx, cz);
+        dirtyChunks.put(key, dim);
+        if (cooldownEnd < 0) cooldownEnd = 1; // 启动冷却
     }
 
-    // ── 结算 ──────────────────────────────────────────
+    /** 每 tick 调用：冷却到期后批量重算所有脏区块 */
+    public void tickCooldown(ServerLevel level, long currentTick) {
+        if (cooldownEnd < 0) return;
 
-    /** 方块变化 / 区块加载：全高度扫描该区块所有 Y 层 */
+        if (cooldownEnd == 1) {
+            // 第一次标记后的 tick：设定冷却到期时间
+            cooldownEnd = currentTick + AdventureConfig.RECALC_COOLDOWN.get();
+            return;
+        }
+
+        if (currentTick < cooldownEnd) return;
+
+        // 冷却到期 → 批量重算所有脏区块
+        for (String key : dirtyChunks.keySet()) {
+            // key 格式: "minecraft:overworld:-32,-48,0"
+            int lastColon = key.lastIndexOf(':');
+            if (lastColon < 0) continue;
+            String[] coords = key.substring(lastColon + 1).split(",");
+            if (coords.length < 2) continue;
+            int cx = Integer.parseInt(coords[0]);
+            int cz = Integer.parseInt(coords[1]);
+            recalculateFullChunk(level, cx, cz);
+        }
+        dirtyChunks.clear();
+        cooldownEnd = -1;
+    }
+
+    // ===================================================================
+    //  结算
+    // ===================================================================
+
     public void recalculateChunkScore(ServerLevel level, BlockPos pos) {
         recalculateFullChunk(level, pos.getX() >> 4, pos.getZ() >> 4);
     }
@@ -37,7 +78,6 @@ public class AdventureScoreService {
         double total = 0.0;
         int bx = cx << 4;
         int bz = cz << 4;
-        // 扫 0~255 高度（覆盖 16 个截面）
         for (int sy = 0; sy < 16; sy++) {
             total += scanSection(level, bx, sy << 4, bz);
         }
@@ -45,7 +85,6 @@ public class AdventureScoreService {
         else perChunkScores.remove(chunkKey);
     }
 
-    /** 扫描单个 16×16×16 截面 */
     private double scanSection(ServerLevel level, int startX, int startY, int startZ) {
         BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
         double total = 0.0;
@@ -61,18 +100,16 @@ public class AdventureScoreService {
         return total;
     }
 
-    // ── 查询 ────────────────────────────────────────────
+    // ===================================================================
+    //  查询
+    // ===================================================================
 
-    /** 单个区块的原始冒险区分数 */
     public double queryScoreAt(ServerLevel level, BlockPos pos) {
         String key = ChunkKey.key(level.dimension().location().toString(),
             pos.getX() >> 4, pos.getZ() >> 4);
         return perChunkScores.getOrDefault(key, 0.0);
     }
 
-    /**
-     * 区域聚合原始分：累加检测半径内所有区块的分数。
-     */
     public double getRegionScoreAt(ServerLevel level, BlockPos pos, int radius) {
         int cx = pos.getX() >> 4;
         int cz = pos.getZ() >> 4;
@@ -87,18 +124,43 @@ public class AdventureScoreService {
         return total;
     }
 
-    /**
-     * 归一化冒险区分数 [0, 1]。
-     * 取检测半径内所有区块的原始分之和，归一化到 [0, 1]。
-     */
     public double getNormalizedScoreAt(ServerLevel level, BlockPos pos) {
         int radius = AdventureConfig.DETECTION_RADIUS.get();
         double raw = getRegionScoreAt(level, pos, radius);
-        double divisor = AdventureConfig.NORMALIZATION_DIVISOR.get();
-        return Math.min(1.0, raw / divisor);
+        return Math.min(1.0, raw / 5.0);
     }
 
-    /** 检测半径内冒险区区块数 */
+    /** 检测半径内区域原始分之和（无归一化，供 API 返回大数值） */
+    public double getRawScoreAt(ServerLevel level, BlockPos pos) {
+        int radius = AdventureConfig.DETECTION_RADIUS.get();
+        return getRegionScoreAt(level, pos, radius);
+    }
+
+    /** 冒险区中心坐标（检测半径内所有冒险区块的平均位置） */
+    public BlockPos getZoneCenter(ServerLevel level, BlockPos pos) {
+        int radius = AdventureConfig.DETECTION_RADIUS.get();
+        int cx = pos.getX() >> 4;
+        int cz = pos.getZ() >> 4;
+        String dim = level.dimension().location().toString();
+        double threshold = AdventureConfig.ZONE_THRESHOLD.get();
+        double divisor = AdventureConfig.NORMALIZATION_DIVISOR.get();
+        int count = 0;
+        int sumX = 0, sumZ = 0;
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                double raw = perChunkScores.getOrDefault(
+                    ChunkKey.key(dim, cx + dx, cz + dz), 0.0);
+                if (Math.min(1.0, raw / divisor) >= threshold) {
+                    count++;
+                    sumX += (cx + dx) * 16 + 8;
+                    sumZ += (cz + dz) * 16 + 8;
+                }
+            }
+        }
+        if (count == 0) return pos;
+        return new BlockPos(sumX / count, pos.getY(), sumZ / count);
+    }
+
     public int getZoneSize(ServerLevel level, BlockPos pos, int radius) {
         int cx = pos.getX() >> 4;
         int cz = pos.getZ() >> 4;
@@ -114,5 +176,14 @@ public class AdventureScoreService {
             }
         }
         return count;
+    }
+
+    // ===================================================================
+    //  区块卸载
+    // ===================================================================
+
+    public void onChunkUnload(ServerLevel level, int cx, int cz) {
+        String prefix = level.dimension().location().toString() + ":" + cx + "," + cz + ",";
+        perChunkScores.keySet().removeIf(k -> k.startsWith(prefix));
     }
 }

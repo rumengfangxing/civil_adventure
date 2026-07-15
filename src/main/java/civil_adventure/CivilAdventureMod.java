@@ -89,8 +89,13 @@ public class CivilAdventureMod {
         if (event.phase != TickEvent.Phase.END) return;
         if (zoneScanner == null || scoreService == null) return;
 
+        long currentTick = event.getServer().getTickCount();
+
         for (ServerLevel level : event.getServer().getAllLevels()) {
             zoneScanner.tick(level);
+
+            // 冷却到期批量重算脏区块
+            scoreService.tickCooldown(level, currentTick);
 
             // 检测玩家进出冒险区 → 发送 HUD 通知
             for (ServerPlayer player : level.players()) {

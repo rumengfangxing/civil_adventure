@@ -11,7 +11,8 @@
     "CivilRegionClassifierMixin",
     "SonarScanMixin",
     "CivilizationScoreMixin",
-    "XaerosColorMixin"
+    "XaerosColorMixin",
+    "ZonePolicyMixin"
   ],
   "client": [],
   "server": []

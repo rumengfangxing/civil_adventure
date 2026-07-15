@@ -55,6 +55,7 @@ public class AdventureBlockChangeMixin {
         AdventureScoreService svc = CivilAdventureMod.getScoreService();
         if (svc == null) return;
 
-        svc.recalculateChunkScore(level, pos);
+        String dim = level.dimension().location().toString();
+        svc.markDirty(dim, pos.getX() >> 4, pos.getZ() >> 4);
     }
 }

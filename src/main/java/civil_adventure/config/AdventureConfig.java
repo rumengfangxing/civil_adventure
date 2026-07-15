@@ -12,6 +12,7 @@ public class AdventureConfig {
     public static final ForgeConfigSpec.ConfigValue<String> ADVENTURE_FILL_COLOR;
     public static final ForgeConfigSpec.BooleanValue ADVENTURE_HUD_ENABLED;
     public static final ForgeConfigSpec.IntValue XAEROS_ALPHA;
+    public static final ForgeConfigSpec.IntValue RECALC_COOLDOWN;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -79,6 +80,10 @@ public class AdventureConfig {
         BUFF_TIMEOUT = builder
             .comment("离开冒险区后属性保留时间（tick），到期回收")
             .defineInRange("buff_timeout_ticks", 200, 20, 12000);
+
+        RECALC_COOLDOWN = builder
+            .comment("方块变化批量重算冷却（tick），冷却期内收集变化、到期一次性算完")
+            .defineInRange("recalc_cooldown_ticks", 5, 1, 100);
 
         builder.pop();
 

@@ -47,4 +47,18 @@ public final class AdventureAPI {
         int radius = civil_adventure.config.AdventureConfig.DETECTION_RADIUS.get();
         return svc.getZoneSize(level, pos, radius);
     }
+
+    /** 检测半径内原始分之和（无归一化上限） */
+    public static double getRawScoreAt(ServerLevel level, BlockPos pos) {
+        AdventureScoreService svc = CivilAdventureMod.getScoreService();
+        if (svc == null) return 0;
+        return svc.getRawScoreAt(level, pos);
+    }
+
+    /** 冒险区中心坐标（检测半径内所有冒险区块的平均位置） */
+    public static BlockPos getZoneCenter(ServerLevel level, BlockPos pos) {
+        AdventureScoreService svc = CivilAdventureMod.getScoreService();
+        if (svc == null) return pos;
+        return svc.getZoneCenter(level, pos);
+    }
 }
