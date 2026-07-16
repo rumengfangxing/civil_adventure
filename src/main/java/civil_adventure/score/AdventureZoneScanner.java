@@ -61,7 +61,6 @@ public class AdventureZoneScanner {
         for (Entity entity : level.getAllEntities()) {
             if (!(entity instanceof LivingEntity living)) continue;
             if (!living.isAlive()) continue;
-            if (living instanceof ServerPlayer) continue;
 
             BlockPos pos = living.blockPosition();
             double threshold = AdventureConfig.ZONE_THRESHOLD.get();
