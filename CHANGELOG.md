@@ -4,12 +4,9 @@
 
 ### ✨ 新增
 
-- 冷却批处理：连续方块变化合并重算（`AdventureScoreService.markDirty` + `tickCooldown`）
-- 区块加载自动扫描（`ChunkEvent.Load` → `recalculateFullChunk`）
-- 文明分类 HIGH → ZONE 覆写（`CivilRegionClassifierMixin`）
-- API 扩展：`getRawScoreAt`、`getZoneCenter`
-- `prevZoneState` 玩家退出清理 + 网络包去抖（20 tick 冷却）
+- 玩家也被纳入可被施加效果和额外属性的实体之列
 
-### 🔧 配置
+### 🔧 修复
 
-新增`recalc_cooldown_ticks`
+原配置文件中"除数"为虚假配置
+现已纠正

@@ -127,7 +127,8 @@ public class AdventureScoreService {
     public double getNormalizedScoreAt(ServerLevel level, BlockPos pos) {
         int radius = AdventureConfig.DETECTION_RADIUS.get();
         double raw = getRegionScoreAt(level, pos, radius);
-        return Math.min(1.0, raw / 5.0);
+        double divisor = AdventureConfig.NORMALIZATION_DIVISOR.get();
+        return Math.min(1.0, raw / divisor);
     }
 
     /** 检测半径内区域原始分之和（无归一化，供 API 返回大数值） */
