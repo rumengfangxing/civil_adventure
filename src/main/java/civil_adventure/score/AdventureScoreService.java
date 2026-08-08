@@ -17,14 +17,44 @@ public class AdventureScoreService {
     // ── 持久分数存储 ──────────────────────────────────
     private final ConcurrentHashMap<String, Double> perChunkScores = new ConcurrentHashMap<>();
 
+    // ── 临时压制（压制方块）────────────────────────────
+    // 压制期间从有效分中扣除，停用/移除后立即回弹
+    private final ConcurrentHashMap<String, Double> suppressedScores = new ConcurrentHashMap<>();
+
     // ── 冷却批处理 ─────────────────────────────────────
     private final ConcurrentHashMap<String, String> dirtyChunks = new ConcurrentHashMap<>(); // dim:cx,cz,0 → dim
     private long cooldownEnd = -1;
 
     public void shutdown() {
         perChunkScores.clear();
+        suppressedScores.clear();
         dirtyChunks.clear();
         cooldownEnd = -1;
+    }
+
+    /** 增加临时压制量 */
+    public void addSuppression(String chunkKey, double amount) {
+        suppressedScores.merge(chunkKey, amount, Double::sum);
+    }
+
+    /** 释放临时压制量（回弹） */
+    public void removeSuppression(String chunkKey, double amount) {
+        suppressedScores.computeIfPresent(chunkKey, (k, v) -> {
+            double remaining = v - amount;
+            return remaining <= 0.01 ? null : remaining;
+        });
+    }
+
+    /** 有效分 = 原始分 - 临时压制（不低于 0） */
+    private double effectiveScore(String key) {
+        double original = perChunkScores.getOrDefault(key, 0.0);
+        double suppressed = suppressedScores.getOrDefault(key, 0.0);
+        return Math.max(0.0, original - suppressed);
+    }
+
+    /** 查询原始分（不受压制影响） */
+    public double queryRawScore(String chunkKey) {
+        return perChunkScores.getOrDefault(chunkKey, 0.0);
     }
 
     // ===================================================================
@@ -107,7 +137,7 @@ public class AdventureScoreService {
     public double queryScoreAt(ServerLevel level, BlockPos pos) {
         String key = ChunkKey.key(level.dimension().location().toString(),
             pos.getX() >> 4, pos.getZ() >> 4);
-        return perChunkScores.getOrDefault(key, 0.0);
+        return effectiveScore(key);
     }
 
     public double getRegionScoreAt(ServerLevel level, BlockPos pos, int radius) {
@@ -117,8 +147,7 @@ public class AdventureScoreService {
         double total = 0.0;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                total += perChunkScores.getOrDefault(
-                    ChunkKey.key(dim, cx + dx, cz + dz), 0.0);
+                total += effectiveScore(ChunkKey.key(dim, cx + dx, cz + dz));
             }
         }
         return total;
@@ -149,8 +178,8 @@ public class AdventureScoreService {
         int sumX = 0, sumZ = 0;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                double raw = perChunkScores.getOrDefault(
-                    ChunkKey.key(dim, cx + dx, cz + dz), 0.0);
+                double raw = effectiveScore(
+                    ChunkKey.key(dim, cx + dx, cz + dz));
                 if (Math.min(1.0, raw / divisor) >= threshold) {
                     count++;
                     sumX += (cx + dx) * 16 + 8;
@@ -171,12 +200,50 @@ public class AdventureScoreService {
         int count = 0;
         for (int dx = -radius; dx <= radius; dx++) {
             for (int dz = -radius; dz <= radius; dz++) {
-                double raw = perChunkScores.getOrDefault(
-                    ChunkKey.key(dim, cx + dx, cz + dz), 0.0);
+                double raw = effectiveScore(
+                    ChunkKey.key(dim, cx + dx, cz + dz));
                 if (Math.min(1.0, raw / divisor) >= threshold) count++;
             }
         }
         return count;
+    }
+
+    // ===================================================================
+    //  压制（压制方块）
+    // ===================================================================
+
+    /**
+     * 压制方块：基于原始分累积临时压制量。
+     * 每次压制: 该区块累计压制 += 原始分 * percent + fixed（不超过原始分）
+     * 原始分不被修改；停用/移除后通过 removeSuppression 回弹。
+     * 返回本次新增的压制量（供方块实体记录以释放）。
+     */
+    public java.util.Map<String, Double> suppressRegionScores(ServerLevel level, BlockPos pos, int radius,
+                                                              double percent, double fixed) {
+        int cx = pos.getX() >> 4;
+        int cz = pos.getZ() >> 4;
+        String dim = level.dimension().location().toString();
+        java.util.Map<String, Double> added = new java.util.HashMap<>();
+
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                String key = ChunkKey.key(dim, cx + dx, cz + dz);
+                double original = perChunkScores.getOrDefault(key, 0.0);
+                if (original <= 0) continue;
+
+                double already = suppressedScores.getOrDefault(key, 0.0);
+                double remaining = original - already;
+                if (remaining <= 0.01) continue; // 已完全压制
+
+                // 基于原始分计算本次压制量
+                double amount = original * percent + fixed;
+                amount = Math.min(amount, remaining); // 不超过剩余原始分
+
+                suppressedScores.merge(key, amount, Double::sum);
+                added.put(key, amount);
+            }
+        }
+        return added;
     }
 
     // ===================================================================

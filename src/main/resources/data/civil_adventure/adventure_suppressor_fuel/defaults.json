@@ -1,0 +1,8 @@
+{
+  "_comment": "压制方块燃料：物品ID → 增加的tick（20 tick = 1 秒）",
+  "replace": false,
+  "entries": [
+    { "item": "minecraft:emerald", "ticks": 1200 },
+    { "item": "minecraft:emerald_block", "ticks": 12000 }
+  ]
+}

@@ -16,6 +16,8 @@ repositories {
     mavenLocal()
     // Modrinth Maven — 用于解析 Civil（文礼）前置模组
     maven { url 'https://api.modrinth.com/maven' }
+    // GeckoLib Maven
+    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
     maven {
         name = "CurseForge"
         url = "https://www.cursemaven.com"
@@ -105,6 +107,9 @@ dependencies {
     // ── 前置模组 ──────────────────────────────────────────
     // Civil（文礼）— 提供文明分查询和地图染色框架
     modImplementation 'maven.modrinth:civillis:9UXo8nDk'
+
+    // GeckoLib — 动画方块渲染（运行时已由玩家自行安装）
+    implementation 'software.bernie.geckolib:geckolib-forge-1.20.1:4.8.4'
 
 }
 

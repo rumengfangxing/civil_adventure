@@ -34,3 +34,11 @@ mixinConfigs = ["${mod_id}.mixins.json"]
     versionRange="[2.0.0,)"
     ordering="AFTER"
     side="BOTH"
+
+# ── GeckoLib — 压制方块动画渲染 ────────────────────────
+[[dependencies.${mod_id}]]
+    modId="geckolib"
+    mandatory=true
+    versionRange="[4.8.0,)"
+    ordering="AFTER"
+    side="BOTH"

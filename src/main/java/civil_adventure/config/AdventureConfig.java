@@ -13,6 +13,10 @@ public class AdventureConfig {
     public static final ForgeConfigSpec.BooleanValue ADVENTURE_HUD_ENABLED;
     public static final ForgeConfigSpec.IntValue XAEROS_ALPHA;
     public static final ForgeConfigSpec.IntValue RECALC_COOLDOWN;
+    public static final ForgeConfigSpec.DoubleValue SUPPRESS_PERCENT;
+    public static final ForgeConfigSpec.DoubleValue SUPPRESS_FIXED;
+    public static final ForgeConfigSpec.IntValue SUPPRESS_INTERVAL;
+    public static final ForgeConfigSpec.IntValue SUPPRESS_RADIUS;
 
     static {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
@@ -84,6 +88,27 @@ public class AdventureConfig {
         RECALC_COOLDOWN = builder
             .comment("方块变化批量重算冷却（tick），冷却期内收集变化、到期一次性算完")
             .defineInRange("recalc_cooldown_ticks", 5, 1, 100);
+
+        builder.pop();
+
+        builder.comment("冒险区压制方块");
+        builder.push("suppressor");
+
+        SUPPRESS_PERCENT = builder
+            .comment("每次压制削减的百分比（0.01 = 1%）")
+            .defineInRange("percent", 0.01, 0.0, 1.0);
+
+        SUPPRESS_FIXED = builder
+            .comment("每次压制削减的固定分数")
+            .defineInRange("fixed", 3.0, 0.0, 1000.0);
+
+        SUPPRESS_INTERVAL = builder
+            .comment("压制动作间隔（tick），20 tick = 1 秒")
+            .defineInRange("interval_ticks", 100, 10, 12000);
+
+        SUPPRESS_RADIUS = builder
+            .comment("压制影响半径（区块）")
+            .defineInRange("radius_chunks", 4, 1, 32);
 
         builder.pop();
 
