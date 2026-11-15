@@ -33,7 +33,10 @@ public final class AdventureEntityLoader {
         Map<ResourceLocation, Resource> resources = manager.listResources(DATA_PATH,
             id -> id.getPath().endsWith(".json"));
 
-        for (Map.Entry<ResourceLocation, Resource> entry : resources.entrySet()) {
+        List<Map.Entry<ResourceLocation, Resource>> sortedEntries = new ArrayList<>(resources.entrySet());
+        sortedEntries.sort(Map.Entry.comparingByKey());
+
+        for (Map.Entry<ResourceLocation, Resource> entry : sortedEntries) {
             ResourceLocation fileId = entry.getKey();
             // data/<ns>/adventure_entities/minecraft.zombie.json → minecraft:zombie
             String path = fileId.getPath();

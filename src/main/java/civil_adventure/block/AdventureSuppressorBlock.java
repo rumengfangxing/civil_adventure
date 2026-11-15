@@ -98,6 +98,24 @@ public class AdventureSuppressorBlock extends Block implements EntityBlock {
         }
     }
 
+    // ── 比较器输出 ─────────────────────────────────────────
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof AdventureSuppressorBlockEntity suppressor) {
+            if (suppressor.isActive()) {
+                return suppressor.isZoneFullySuppressed() ? 15 : 8;
+            }
+        }
+        return 0;
+    }
+
     // ── 右键：手持燃料→加时；其他→切换启用/停用 ──────────
 
     @Override
@@ -168,11 +186,7 @@ public class AdventureSuppressorBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (level.isClientSide) return null;
-        return (lvl, pos, st, be) -> {
-            if (be instanceof AdventureSuppressorBlockEntity suppressor) {
-                suppressor.serverTick();
-            }
-        };
+        if (level.isClientSide || type != CivilAdventureMod.SUPPRESSOR_BLOCK_ENTITY.get()) return null;
+        return (lvl, pos, st, be) -> ((AdventureSuppressorBlockEntity) be).serverTick();
     }
 }

@@ -1,0 +1,44 @@
+{
+    "blend": {
+        "func": "add",
+        "srcrgb": "srcalpha",
+        "dstrgb": "1-srcalpha"
+    },
+    "vertex": "civil_adventure:adventure_overlay",
+    "fragment": "civil_adventure:adventure_overlay",
+    "attributes": [
+        "Position",
+        "Color",
+        "UV0"
+    ],
+    "samplers": [
+        { "name": "Sampler0" }
+    ],
+    "uniforms": [
+        { "name": "ModelViewMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+        { "name": "ColorModulator", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0, 1.0 ] },
+        { "name": "GameTime", "type": "float", "count": 1, "values": [ 0.0 ] },
+        { "name": "OverlayOpacity", "type": "float", "count": 1, "values": [ 1.0 ] },
+        { "name": "Aspect", "type": "float", "count": 1, "values": [ 1.0 ] },
+        { "name": "GlitchIntensity", "type": "float", "count": 1, "values": [ 0.0 ] },
+        { "name": "GlitchMode", "type": "int", "count": 1, "values": [ 0 ] },
+        { "name": "ScreenSize", "type": "float", "count": 2, "values": [ 100.0, 100.0 ] },
+        { "name": "BackgroundColor", "type": "float", "count": 4, "values": [ 0.047, 0.039, 0.055, 1.0 ] },
+        { "name": "BorderColor", "type": "float", "count": 4, "values": [ 0.92, 0.12, 0.12, 1.0 ] },
+        { "name": "BorderThickness", "type": "float", "count": 1, "values": [ 0.02 ] },
+        { "name": "BorderStyle", "type": "int", "count": 1, "values": [ 0 ] },
+        { "name": "BorderPulseSpeed", "type": "float", "count": 1, "values": [ 2.0 ] },
+        { "name": "FillMode", "type": "int", "count": 1, "values": [ 0 ] },
+        { "name": "VignettePower", "type": "float", "count": 1, "values": [ 1.5 ] },
+        { "name": "DecalScale", "type": "float", "count": 1, "values": [ 0.75 ] },
+        { "name": "DecalAspectCorrection", "type": "int", "count": 1, "values": [ 1 ] },
+        { "name": "ScanlineCount", "type": "float", "count": 1, "values": [ 40.0 ] },
+        { "name": "ScanlineSpeed", "type": "float", "count": 1, "values": [ 12.0 ] },
+        { "name": "ScanlineJitter", "type": "float", "count": 1, "values": [ 0.08 ] },
+        { "name": "ChromaticOffset", "type": "float", "count": 1, "values": [ 0.015 ] },
+        { "name": "CheckerSpeed", "type": "float", "count": 1, "values": [ 8.0 ] },
+        { "name": "CheckerColorA", "type": "float", "count": 4, "values": [ 1.0, 0.0, 1.0, 1.0 ] },
+        { "name": "CheckerColorB", "type": "float", "count": 4, "values": [ 0.0, 0.0, 0.0, 1.0 ] }
+    ]
+}

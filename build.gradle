@@ -105,8 +105,8 @@ dependencies {
     // Mixin 处理器
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     // ── 前置模组 ──────────────────────────────────────────
-    // Civil（文礼）— 提供文明分查询和地图染色框架
-    modImplementation 'maven.modrinth:civillis:9UXo8nDk'
+    // Civil（文礼）— 提供文明分查询和地图染色框架（2.0.1 起 ZoneTransitionPayload 为三参 record）
+    modImplementation 'maven.modrinth:civillis:hUGhYIQF'
 
     // GeckoLib — 动画方块渲染（运行时已由玩家自行安装）
     implementation 'software.bernie.geckolib:geckolib-forge-1.20.1:4.8.4'

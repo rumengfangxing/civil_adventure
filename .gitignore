@@ -19,7 +19,9 @@ Civil_Adventure_代码审查报告.md
 nbt
 .gitattributes
 .github/
-
-# gradle junk
-gradle/*.jar
+.vscode/
+archive/
+tools/
+*.zip
+*.jar
 !gradle/wrapper/gradle-wrapper.jar

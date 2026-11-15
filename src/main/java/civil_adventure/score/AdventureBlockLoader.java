@@ -14,7 +14,9 @@ import net.minecraft.world.level.block.Block;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class AdventureBlockLoader {
@@ -31,7 +33,10 @@ public final class AdventureBlockLoader {
         Map<ResourceLocation, Resource> resources = manager.listResources(DATA_PATH,
             id -> id.getPath().endsWith(".json"));
 
-        for (Map.Entry<ResourceLocation, Resource> entry : resources.entrySet()) {
+        List<Map.Entry<ResourceLocation, Resource>> sortedEntries = new ArrayList<>(resources.entrySet());
+        sortedEntries.sort(Map.Entry.comparingByKey());
+
+        for (Map.Entry<ResourceLocation, Resource> entry : sortedEntries) {
             ResourceLocation fileId = entry.getKey();
             try (InputStream is = entry.getValue().open();
                  InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
@@ -74,5 +79,9 @@ public final class AdventureBlockLoader {
 
     public static boolean hasWeight(Block block) {
         return globalWeights.containsKey(block);
+    }
+
+    public static boolean hasWeight(net.minecraft.world.level.block.state.BlockState state) {
+        return state != null && globalWeights.containsKey(state.getBlock());
     }
 }

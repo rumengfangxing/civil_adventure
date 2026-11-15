@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "enabled=false": {
+      "model": "civil_adventure:block/adventure_suppressor"
+    },
+    "enabled=true": {
+      "model": "civil_adventure:block/adventure_suppressor"
+    }
+  }
+}

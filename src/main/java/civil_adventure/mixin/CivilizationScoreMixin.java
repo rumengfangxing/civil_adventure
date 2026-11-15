@@ -46,6 +46,11 @@ public class CivilizationScoreMixin {
     private static boolean isAdventureZone(ServerLevel level, BlockPos pos) {
         AdventureScoreService svc = CivilAdventureMod.getScoreService();
         if (svc == null) return false;
-        return svc.getNormalizedScoreAt(level, pos) >= AdventureConfig.CIV_OVERRIDE_THRESHOLD.get();
+        civil_adventure.cluster.MacroCluster cluster = svc.getClusterAt(level, pos);
+        if (cluster != null && cluster.hasDominance()) {
+            civil_adventure.faction.FactionDefinition dom = cluster.getDominantFaction();
+            return dom != null && !dom.isCivilization();
+        }
+        return false;
     }
 }

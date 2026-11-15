@@ -1,0 +1,49 @@
+{
+  "name": "civil_adventure.faction.fungal.name",
+  "color": "#33CC55",
+  "min_dominance_score": 10.0,
+  "structures": [
+    "biomancy:flesh_nest"
+  ],
+  "structure_base_score": 500.0,
+  "entity_whitelist": {
+    "tags": [
+      "#civil_adventure:fungal_entities"
+    ],
+    "entities": []
+  },
+  "blocks": [
+    {
+      "block": "minecraft:warped_nylium",
+      "weight": 2.0
+    },
+    {
+      "block": "minecraft:crimson_nylium",
+      "weight": 2.0
+    },
+    {
+      "block": "minecraft:shroomlight",
+      "weight": 4.0
+    }
+  ],
+  "tags": {
+    "is_tag": "civil_adventure:is_fungal",
+    "not_tag": "civil_adventure:not_fungal"
+  },
+  "dominant_buffs": {
+    "attributes": [
+      {
+        "attribute": "minecraft:generic.movement_speed",
+        "amount": 0.15,
+        "operation": 1
+      }
+    ],
+    "effects": [
+      {
+        "effect": "minecraft:resistance",
+        "duration": 100,
+        "amplifier": 0
+      }
+    ]
+  }
+}

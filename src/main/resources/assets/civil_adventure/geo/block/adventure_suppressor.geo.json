@@ -16,7 +16,7 @@
       },
       "bones": [
         {
-          "name": "主体",
+          "name": "body",
           "pivot": [
             -1.169,
             14.1835,
@@ -24,8 +24,8 @@
           ]
         },
         {
-          "name": "核心",
-          "parent": "主体",
+          "name": "core",
+          "parent": "body",
           "pivot": [
             -1.169,
             14.1835,
@@ -203,8 +203,8 @@
           ]
         },
         {
-          "name": "环1",
-          "parent": "主体",
+          "name": "ring1",
+          "parent": "body",
           "pivot": [
             -1.1125,
             14.41593,
@@ -851,8 +851,8 @@
           ]
         },
         {
-          "name": "环2",
-          "parent": "主体",
+          "name": "ring2",
+          "parent": "body",
           "pivot": [
             -1.125,
             14.41593,
@@ -1499,8 +1499,8 @@
           ]
         },
         {
-          "name": "环3",
-          "parent": "主体",
+          "name": "ring3",
+          "parent": "body",
           "pivot": [
             -1.125,
             14.41593,
@@ -2142,8 +2142,8 @@
           ]
         },
         {
-          "name": "四柱",
-          "parent": "主体",
+          "name": "pillars",
+          "parent": "body",
           "pivot": [
             -1.16903,
             14.18354,
@@ -2449,8 +2449,8 @@
           ]
         },
         {
-          "name": "四外柱",
-          "parent": "四柱",
+          "name": "pillars_outer",
+          "parent": "pillars",
           "pivot": [
             -1.1125,
             14.41593,
@@ -2761,7 +2761,7 @@
           ]
         },
         {
-          "name": "基座",
+          "name": "base",
           "pivot": [
             16.99188,
             12.66593,

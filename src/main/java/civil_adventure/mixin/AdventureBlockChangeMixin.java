@@ -7,55 +7,83 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.ArrayDeque;
+
 /**
- * 仿文礼 CivilLevelBlockChangeMixin，拦截 Level.setBlock 捕获方块变化。
- * 当冒险区方块被放置/破坏时，全量扫描区块重新计算分数。
- *
- * 线程安全：HEAD/RETURN 之间任一退出路径均保证 pop 平衡。
+ * 拦截 Level.setBlock 捕获方块变化。
+ * 当冒险区方块被放置/破坏时，标记脏区块触发防抖分数重算。
+ * [修复 REG-01] 拦截 4 参数底层 setBlock 方法 (覆盖 destroyBlock 等路径)；
+ * 先做 ServerLevel 判空杜绝客户端线程分配；复用 ThreadLocal ArrayDeque 实例杜绝每次销毁。
  */
 @Mixin(Level.class)
 public class AdventureBlockChangeMixin {
 
-    private static final ThreadLocal<ArrayDeque<BlockState>> oldStateStack =
-        ThreadLocal.withInitial(ArrayDeque::new);
+    @Unique
+    private record PosStateSnapshot(BlockPos pos, BlockState state) {}
 
-    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
-            at = @At("HEAD"))
-    private void captureOldState(BlockPos pos, BlockState state, int flags,
-                                  CallbackInfoReturnable<Boolean> cir) {
+    @Unique
+    private static final ThreadLocal<ArrayDeque<PosStateSnapshot>> civilAdventure$oldStateStack =
+        ThreadLocal.withInitial(() -> new ArrayDeque<>(8));
+
+    @Inject(
+        method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+        at = @At("HEAD")
+    )
+    private void civilAdventure$captureOldState(BlockPos pos, BlockState state, int flags, int recursionLeft,
+                                                CallbackInfoReturnable<Boolean> cir) {
         if ((Object) this instanceof ServerLevel level) {
-            oldStateStack.get().push(level.getBlockState(pos));
+            ArrayDeque<PosStateSnapshot> stack = civilAdventure$oldStateStack.get();
+            if (stack.size() > 64) {
+                stack.clear(); // [修复 M-04] 异常逃逸自愈保护
+            }
+            stack.push(new PosStateSnapshot(pos.immutable(), level.getBlockState(pos)));
         }
     }
 
-    @Inject(method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)Z",
-            at = @At("RETURN"))
-    private void onBlockSet(BlockPos pos, BlockState newState, int flags,
-                             CallbackInfoReturnable<Boolean> cir) {
-        // 先取旧状态（无论 success 与否都必须 pop 保持栈平衡）
-        Deque<BlockState> stack = oldStateStack.get();
-        BlockState oldState = stack.isEmpty() ? null : stack.pop();
-        if (stack.isEmpty()) oldStateStack.remove();
-
-        // 非服务端或变更失败 → 已 cleanup，直接返回
+    @Inject(
+        method = "setBlock(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;II)Z",
+        at = @At("RETURN")
+    )
+    private void civilAdventure$onBlockSet(BlockPos pos, BlockState newState, int flags, int recursionLeft,
+                                           CallbackInfoReturnable<Boolean> cir) {
+        // 1. 先拦截非 ServerLevel，彻底杜绝 ClientLevel 线程触发 ThreadLocal 初始化
         if (!((Object) this instanceof ServerLevel level)) return;
-        if (!cir.getReturnValue()) return;
 
-        boolean oldIsAdventure = oldState != null && AdventureBlockLoader.hasWeight(oldState.getBlock());
-        boolean newIsAdventure = AdventureBlockLoader.hasWeight(newState.getBlock());
+        // 2. 弹出匹配的坐标快照，保留空 ArrayDeque 实例在 ThreadLocal 中复用，严禁每次 remove()
+        ArrayDeque<PosStateSnapshot> stack = civilAdventure$oldStateStack.get();
+        PosStateSnapshot matched = null;
+        while (!stack.isEmpty()) {
+            PosStateSnapshot top = stack.pop();
+            if (top.pos().equals(pos)) {
+                matched = top;
+                break;
+            }
+        }
+
+        if (!cir.getReturnValue() || matched == null) return;
+
+        BlockState oldState = matched.state();
+        if (oldState.is(newState.getBlock())) return;
+
+        boolean oldIsAdventure = (oldState != null && (
+            civil_adventure.faction.FactionRegistry.isAnyFactionBlock(oldState) ||
+            AdventureBlockLoader.hasWeight(oldState.getBlock())
+        ));
+        boolean newIsAdventure = (newState != null && (
+            civil_adventure.faction.FactionRegistry.isAnyFactionBlock(newState) ||
+            AdventureBlockLoader.hasWeight(newState.getBlock())
+        ));
         if (!oldIsAdventure && !newIsAdventure) return;
 
         AdventureScoreService svc = CivilAdventureMod.getScoreService();
         if (svc == null) return;
 
-        String dim = level.dimension().location().toString();
-        svc.markDirty(dim, pos.getX() >> 4, pos.getZ() >> 4);
+        svc.markDirty(level.dimension().location(), pos.getX() >> 4, pos.getZ() >> 4);
     }
 }

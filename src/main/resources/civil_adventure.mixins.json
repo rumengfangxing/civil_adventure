@@ -9,11 +9,14 @@
     "AdventureBlockChangeMixin",
     "CivilMapTintPaletteMixin",
     "CivilRegionClassifierMixin",
-    "SonarScanMixin",
     "CivilizationScoreMixin",
-    "XaerosColorMixin",
     "ZonePolicyMixin"
   ],
-  "client": [],
+  "client": [
+    "CivilMinimapMixin",
+    "CivilWorldMapMixin",
+    "GuiMapMixin",
+    "XaerosColorMixin"
+  ],
   "server": []
 }

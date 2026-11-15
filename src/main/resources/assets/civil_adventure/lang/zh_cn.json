@@ -1,4 +1,8 @@
 {
   "civil_adventure.title": "冒险区系统",
-  "civil_adventure.score": "冒险区分数"
+  "civil_adventure.score": "冒险区分数",
+  "block.civil_adventure.adventure_suppressor": "冒险区压制核心",
+  "civil_adventure.faction.civilization.name": "文明派系",
+  "civil_adventure.faction.adventure.name": "灾厄派系",
+  "civil_adventure.faction.fungal.name": "感染派系"
 }
