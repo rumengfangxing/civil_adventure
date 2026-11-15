@@ -25,3 +25,4 @@ tools/
 *.zip
 *.jar
 !gradle/wrapper/gradle-wrapper.jar
+/docs
