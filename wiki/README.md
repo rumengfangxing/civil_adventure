@@ -3,6 +3,8 @@
 Welcome to the **Civil Adventure (文礼·地缘对抗生态引擎)** official documentation and configuration wiki.  
 欢迎查阅 **Civil Adventure (文礼·地缘对抗生态引擎)** 官方文档与配置指南。
 
+> 🌐 **推荐在线查阅 GitHub 官方 Wiki**：[https://github.com/rumengfangxing/civil_adventure/wiki](https://github.com/rumengfangxing/civil_adventure/wiki)（支持全局侧边栏导航与锚点定位）
+
 ---
 
 ## 📖 Available Documentation / 可用文档

@@ -13,11 +13,11 @@
 
 ## 📖 官方文档与配置 Wiki / Documentation & Wiki
 
-本模组提供详尽的中英文双语深度配置与数据包开发手册：
+本模组提供详尽的中英文双语深度配置与数据包开发手册，推荐前往 GitHub 官方 Wiki 查阅获得最佳排版与全局侧边栏导航体验：
 
-- 🧭 **[Wiki 导航总览 / Wiki Index](./wiki/README.md)**
-- 🇨🇳 **[中文版深度配置手册 (CONFIGURATION_GUIDE_ZH.md)](./wiki/CONFIGURATION_GUIDE_ZH.md)**
-- 🇬🇧 **[English In-Depth Configuration Guide (CONFIGURATION_GUIDE_EN.md)](./wiki/CONFIGURATION_GUIDE_EN.md)**
+- 🌐 **[GitHub 官方 Wiki 主页 (Official Wiki)](https://github.com/rumengfangxing/civil_adventure/wiki)**
+- 🇨🇳 **[中文版深度配置手册 (GitHub Wiki)](https://github.com/rumengfangxing/civil_adventure/wiki/Configuration-Guide-ZH)** · [本地离线镜像](./wiki/CONFIGURATION_GUIDE_ZH.md)
+- 🇬🇧 **[English In-Depth Configuration Guide (GitHub Wiki)](https://github.com/rumengfangxing/civil_adventure/wiki/Configuration-Guide-EN)** · [Local Offline Mirror](./wiki/CONFIGURATION_GUIDE_EN.md)
 
 ---
 
