@@ -5,6 +5,8 @@
 [![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
 [![Version](https://img.shields.io/badge/Version-1.4.0-success.svg)](https://github.com/rumengfangxing/civil_adventure/releases)
 [![Civillis](https://img.shields.io/badge/Requires-Civillis_2.0.1+-purple.svg)](https://www.curseforge.com/minecraft/mc-mods/civillis)
+[![Mod License](https://img.shields.io/badge/Mod-ARR-red.svg)](LICENSE.txt)
+[![Datapacks License](https://img.shields.io/badge/Datapacks-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 > **Civil Adventure** 是一款针对 Minecraft 1.20.1 Forge 平台深度开发的高性能**多派系地缘对抗与宏观领地割据引擎**。  
 > 本模组全面重构并升格了前置模组 **Civillis (文礼)** 的单向静态冒险区（Zone）逻辑，为整合包作者提供了一套完全数据驱动、支持多方异族割据、成王败寇宏观领地聚类、同心圆波前削减压制以及 OpenGL CoreShader 战术战争迷雾的领地争端解决方案。
@@ -149,6 +151,7 @@ src/main/java/civil_adventure/
 
 ---
 
-## 📜 开源协议 (License)
+## 📜 许可证 (License)
 
-本项目采用 [MIT 许可证](LICENSE.txt) 开源。欢迎整合包作者自由引入、修改配置与数据包。
+* **模组核心代码与二进制 (Mod Code & Binaries)**：采用 **All Rights Reserved (ARR / 保留所有权利)**。模组底层涉及对文礼 (Civillis) 核心归一化算法与区域架构的深度适配与重构，受原作者与知识产权保护，严禁私自逆向、抄袭或未经授权的二次分发。详情参阅 [LICENSE.txt](LICENSE.txt)。
+* **数据包配置与资产 (Datapack Assets & Configurations)**：采用 **[MIT License](https://opensource.org/licenses/MIT)** 开源。整合包作者（Packmaker）可完全自由地引用、复用、修改、定制与再分发所有派系规格 (`adventure_factions`)、实体配置 (`adventure_entities`)、压制燃料 (`adventure_suppressor_fuel`) 及相关 KubeJS 联动脚本。

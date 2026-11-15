@@ -35,5 +35,11 @@ Comprehensive documentation for Forge configuration, faction datapacks, entity s
 Civil Adventure upgrades the Civillis adventure zone system into a fully extensible, multi-faction geopolitical territorial rivalry engine.  
 Civil Adventure 将文礼的单向冒险区机制升格为完全数据驱动、支持多派系宏观割据与地缘对抗的动态生态引擎。
 
+---
+
+## 📜 License / 许可证说明
+- **Mod Core / 模组二进制与代码**: All Rights Reserved (ARR / 保留所有权利)
+- **Datapack Assets / 数据包与配置资产**: MIT License（整合包作者可自由引用、修改与定制）
+
 For general gameplay overview, installation guides, and architectural highlights, visit the [Project README](../README.md).  
 关于模组的通用玩法介绍、安装指南与核心架构，请参阅 [项目 README](../README.md)。
