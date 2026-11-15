@@ -1,17 +1,65 @@
-All Rights Reserved
+==============================================================================
+Civil Adventure — Licensing Terms (模组许可证协议)
+==============================================================================
 
-Copyright (c) 2025-2026 l
+This project utilizes a dual-licensing model:
+本项目采用双重许可架构：
 
-This software and associated documentation files (the "Software") are the
-exclusive property of the copyright holder. No part of the Software may be
-used, copied, modified, merged, published, distributed, sublicensed, or
-sold, in any form or by any means, without the prior written permission of
-the copyright holder.
+1. 模组核心代码与二进制产物 (Mod Core, Source Code & Binaries) -> All Rights Reserved (ARR)
+2. 数据包配置、派系规格与脚本资产 (Datapack Assets & Configurations) -> MIT License
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+------------------------------------------------------------------------------
+PART 1: MOD SOURCE CODE & BINARIES (All Rights Reserved / 保留所有权利)
+------------------------------------------------------------------------------
+Copyright (c) 2025-2026 rumengfangxing
+
+All Rights Reserved.
+
+The Minecraft mod source code, bytecode, compiled binaries, and associated mod
+infrastructure files ("Mod Software") are the exclusive property of the copyright
+holder.
+
+Portions of the underlying normalization and zone classification algorithms are
+derived from and designed to integrate with Civillis (文礼). To protect the
+integrity of these algorithms and respect intellectual property rights:
+
+No part of the Mod Software may be copied, modified, reverse engineered,
+redistributed, re-uploaded, sublicensed, or sold, in whole or in part, without
+the prior written permission of the copyright holder.
+
+THE MOD SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF
-OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+MOD SOFTWARE.
+
+------------------------------------------------------------------------------
+PART 2: DATAPACK ASSETS & CONFIGURATION PRESETS (MIT License / 开源许可)
+------------------------------------------------------------------------------
+Copyright (c) 2025-2026 rumengfangxing
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files, specifically comprising:
+  - Faction datapack specifications (data/*/adventure_factions/*.json)
+  - Entity attribute & buff presets (data/*/adventure_entities/*.json)
+  - Suppressor fuel definitions (data/*/adventure_suppressor_fuel/*.json)
+  - Modpack configuration files (config/civil_adventure-common.toml)
+  - KubeJS compatibility scripts and integration examples
+(collectively, the "Datapack Assets"), to deal in the Datapack Assets without
+restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Datapack
+Assets, and to permit persons to whom the Datapack Assets are furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Datapack Assets.
+
+THE DATAPACK ASSETS ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
+OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE DATAPACK ASSETS.
